@@ -15,7 +15,8 @@
 :root{--bg:#0f1a14;--card:#1a2a21;--a:#2f9e6b;--b:#e08a2e;--t:#f1f5f2;--m:#8fa597;--w:#ffd84d}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font-family:system-ui,-apple-system,"Noto Sans Thai",sans-serif;user-select:none}
 .app{max-width:520px;margin:0 auto;height:100%;display:flex;flex-direction:column;padding:max(10px,env(safe-area-inset-top)) 12px max(10px,env(safe-area-inset-bottom))}
-.call{text-align:center;padding:8px 0 10px}
+.call{text-align:center;padding:8px 0 10px;position:relative}
+.lang{position:absolute;right:0;top:8px;background:var(--card);color:var(--t);border:0;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer}
 .call small{color:var(--m);font-size:13px;display:block}
 .call b{font-size:34px;letter-spacing:4px;font-variant-numeric:tabular-nums}
 .teams{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px;min-height:0}
@@ -48,40 +49,54 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--t);font-family:s
 </head>
 <body>
 <div class="app">
-  <div class="call"><small id="callLbl">คะแนนที่ต้องประกาศ</small><b id="call">0-0-2</b></div>
+  <div class="call"><button class="lang" id="lang">EN</button><small id="callLbl">&nbsp;</small><b id="call">0-0-2</b></div>
   <div class="teams">
-    <button class="team a" id="tA"><div class="srv" id="sA"></div><input id="nA" value="ทีม A" maxlength="14"><div class="score" id="pA">0</div><div class="games" id="gA"></div><div class="hint" id="hA"></div></button>
-    <button class="team b" id="tB"><div class="srv" id="sB"></div><input id="nB" value="ทีม B" maxlength="14"><div class="score" id="pB">0</div><div class="games" id="gB"></div><div class="hint" id="hB"></div></button>
+    <button class="team a" id="tA"><div class="srv" id="sA"></div><input id="nA" value="" maxlength="14"><div class="score" id="pA">0</div><div class="games" id="gA"></div><div class="hint" id="hA"></div></button>
+    <button class="team b" id="tB"><div class="srv" id="sB"></div><input id="nB" value="" maxlength="14"><div class="score" id="pB">0</div><div class="games" id="gB"></div><div class="hint" id="hB"></div></button>
   </div>
-  <button class="fault" id="fault">❌ เสิร์ฟเสีย / เบรคเสิร์ฟ</button>
+  <button class="fault" id="fault" data-t="fault"></button>
   <div class="bar">
-    <button id="undo">↩ ย้อนกลับ</button>
-    <button id="reset">เกมใหม่</button>
-    <button id="set">⚙ ตั้งค่า</button>
+    <button id="undo" data-t="undo"></button>
+    <button id="reset" data-t="reset"></button>
+    <button id="set" data-t="set"></button>
   </div>
 </div>
 
 <div class="modal" id="mSet"><div class="box">
-  <h2>ตั้งค่า</h2>
-  <div class="row"><span>รูปแบบ</span><div class="seg" id="sgMode"><button data-v="doubles">คู่</button><button data-v="singles">เดี่ยว</button></div></div>
-  <div class="row"><span>เล่นถึง</span><div class="seg" id="sgTarget"><button data-v="11">11</button><button data-v="15">15</button><button data-v="21">21</button></div></div>
-  <div class="row"><span>ชนะต้องห่าง 2 แต้ม</span><div class="seg" id="sgWin"><button data-v="1">ใช่</button><button data-v="0">ไม่</button></div></div>
-  <div class="row"><span>ทีมเสิร์ฟก่อน</span><div class="seg" id="sgFirst"><button data-v="0">A</button><button data-v="1">B</button></div></div>
-  <div class="row"><span>เริ่มที่คนเสิร์ฟ</span><div class="seg" id="sgNum"><button data-v="1">คนที่ 1</button><button data-v="2">คนที่ 2 (ทางการ)</button></div></div>
-  <button class="big" id="apply">เริ่มเกมใหม่ด้วยค่านี้</button>
-  <button class="big ghost" id="closeSet">ปิด</button>
+  <h2 data-t="setTitle"></h2>
+  <div class="row"><span data-t="mode"></span><div class="seg" id="sgMode"><button data-v="doubles" data-t="doubles"></button><button data-v="singles" data-t="singles"></button></div></div>
+  <div class="row"><span data-t="to"></span><div class="seg" id="sgTarget"><button data-v="11">11</button><button data-v="15">15</button><button data-v="21">21</button></div></div>
+  <div class="row"><span data-t="win2"></span><div class="seg" id="sgWin"><button data-v="1" data-t="yes"></button><button data-v="0" data-t="no"></button></div></div>
+  <div class="row"><span data-t="first"></span><div class="seg" id="sgFirst"><button data-v="0">A</button><button data-v="1">B</button></div></div>
+  <div class="row"><span data-t="startNum"></span><div class="seg" id="sgNum"><button data-v="1" data-t="n1"></button><button data-v="2" data-t="n2"></button></div></div>
+  <button class="big" id="apply" data-t="apply"></button>
+  <button class="big ghost" id="closeSet" data-t="close"></button>
 </div></div>
 
 <div class="modal" id="mWin"><div class="box win">
   <div class="t">🏆</div><h2 id="wName"></h2><div id="wScore" style="color:var(--m);margin-bottom:6px"></div>
-  <button class="big" id="next">เกมต่อไป</button>
-  <button class="big ghost" id="undo2">ย้อนแต้มสุดท้าย</button>
+  <button class="big" id="next" data-t="next"></button>
+  <button class="big ghost" id="undo2" data-t="undo2"></button>
 </div></div>
 
 <script>
 const $=id=>document.getElementById(id);
 let cfg={mode:'doubles',target:11,win2:1,first:0,startNum:2};
-let S, hist=[], games=[0,0], names=['ทีม A','ทีม B'];
+const T={
+th:{fault:'❌ เสิร์ฟเสีย / เบรคเสิร์ฟ',undo:'↩ ย้อนกลับ',reset:'เกมใหม่',set:'⚙ ตั้งค่า',setTitle:'ตั้งค่า',mode:'รูปแบบ',doubles:'คู่',singles:'เดี่ยว',to:'เล่นถึง',win2:'ชนะต้องห่าง 2 แต้ม',yes:'ใช่',no:'ไม่',first:'ทีมเสิร์ฟก่อน',startNum:'เริ่มที่คนเสิร์ฟ',n1:'คนที่ 1',n2:'คนที่ 2 (ทางการ)',apply:'เริ่มเกมใหม่ด้วยค่านี้',close:'ปิด',next:'เกมต่อไป',undo2:'ย้อนแต้มสุดท้าย',
+  team:'ทีม',wins:n=>n+' ชนะ!',callS:'ประกาศ (เสิร์ฟ-รับ',callD:'-คนเสิร์ฟ',serve:'เสิร์ฟ',srvNum:' คนที่ ',side:'ฝั่ง',right:'ขวา',left:'ซ้าย',tapPt:'แตะ = ได้แต้ม',recv:'ทีมรับ',gw:n=>'ชนะ '+n+' เกม',conf:'เริ่มเกมใหม่? แต้มปัจจุบันจะหายไป',other:'EN'},
+en:{fault:'❌ Fault / Side out',undo:'↩ Undo',reset:'New game',set:'⚙ Settings',setTitle:'Settings',mode:'Format',doubles:'Doubles',singles:'Singles',to:'Play to',win2:'Win by 2',yes:'Yes',no:'No',first:'First serve',startNum:'Start at server',n1:'Server 1',n2:'Server 2 (official)',apply:'Start new game with these',close:'Close',next:'Next game',undo2:'Undo last point',
+  team:'Team',wins:n=>n+' wins!',callS:'Call (server-receiver',callD:'-server no.',serve:'Serving',srvNum:' · Server ',side:'',right:'right side',left:'left side',tapPt:'Tap = point',recv:'Receiving',gw:n=>n+' game'+(n===1?'':'s')+' won',conf:'Start a new game? Current score will be lost.',other:'TH'}};
+let lang='th';try{lang=localStorage.getItem('pblang')||((navigator.language||'').toLowerCase().startsWith('th')?'th':'en')}catch(e){}
+const L=()=>T[lang];
+let S, hist=[], games=[0,0], names=['',''];
+const isDef=n=>!n||n==='ทีม A'||n==='ทีม B'||n==='Team A'||n==='Team B';
+function nm(i){return isDef(names[i])?L().team+' '+'AB'[i]:names[i]}
+function applyLang(){
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-t]').forEach(el=>{el.textContent=L()[el.dataset.t]});
+  $('lang').textContent=L().other;
+}
 function fresh(){return{p:[0,0],srv:cfg.first,num:cfg.mode==='doubles'?(cfg.startNum||2):1,over:false}}
 function save(){try{localStorage.setItem('pb2',JSON.stringify({cfg,S,hist,games,names}))}catch(e){}}
 function load(){try{const d=JSON.parse(localStorage.getItem('pb2'));if(d){cfg=d.cfg;S=d.S;hist=d.hist;games=d.games;names=d.names;return}}catch(e){}S=fresh()}
@@ -109,7 +124,7 @@ function fault(){
 }
 $('fault').onclick=fault;
 function showWin(w){
-  $('wName').textContent=names[w]+' ชนะ!';
+  $('wName').textContent=L().wins(nm(w));
   $('wScore').textContent=S.p[0]+' - '+S.p[1];
   $('mWin').classList.add('show');
 }
@@ -123,22 +138,23 @@ function render(){
   const s=S.srv,r=1-s;
   const call=cfg.mode==='doubles'?`${S.p[s]}-${S.p[r]}-${S.num}`:`${S.p[s]}-${S.p[r]}`;
   $('call').textContent=call;
-  $('callLbl').textContent='ประกาศ (เสิร์ฟ-รับ'+(cfg.mode==='doubles'?'-คนเสิร์ฟ':'')+')';
+  $('callLbl').textContent=L().callS+(cfg.mode==='doubles'?L().callD:'')+')';
   ['A','B'].forEach((k,i)=>{
     const isS=i===s;
-    $('s'+k).innerHTML=isS?`<span class="badge">🏓 เสิร์ฟ${cfg.mode==='doubles'?' คนที่ '+S.num:''} · ฝั่ง${S.p[i]%2===0?'ขวา':'ซ้าย'}</span>`:'';
-    $('h'+k).textContent=isS?'แตะ = ได้แต้ม':'ทีมรับ';
-    $('g'+k).textContent='ชนะ '+games[i]+' เกม';
-    $('n'+k).value=names[i];
+    $('s'+k).innerHTML=isS?`<span class="badge">🏓 ${L().serve}${cfg.mode==='doubles'?L().srvNum+S.num:''} · ${L().side}${S.p[i]%2===0?L().right:L().left}</span>`:'';
+    $('h'+k).textContent=isS?L().tapPt:L().recv;
+    $('g'+k).textContent=L().gw(games[i]);
+    $('n'+k).value=nm(i);
   });
   $('undo').disabled=!hist.length;
 }
 $('tA').onclick=e=>{if(e.target.tagName!=='INPUT')tap(0)};
 $('tB').onclick=e=>{if(e.target.tagName!=='INPUT')tap(1)};
 $('nA').oninput=e=>{names[0]=e.target.value;save()};
+$('lang').onclick=()=>{lang=lang==='th'?'en':'th';try{localStorage.setItem('pblang',lang)}catch(e){}applyLang();render()};
 $('nB').oninput=e=>{names[1]=e.target.value;save()};
 $('undo').onclick=undo;$('undo2').onclick=undo;
-$('reset').onclick=()=>{if(S.p[0]+S.p[1]===0||confirm('เริ่มเกมใหม่? แต้มปัจจุบันจะหายไป')){}else return;newGame()};
+$('reset').onclick=()=>{if(S.p[0]+S.p[1]===0||confirm(L().conf)){}else return;newGame()};
 function newGame(){S=fresh();hist=[];$('mWin').classList.remove('show');render();save()}
 $('next').onclick=()=>{cfg.first=1-cfg.first;newGame()};
 function segs(){
@@ -155,7 +171,7 @@ $('set').onclick=()=>{segs();$('mSet').classList.add('show')};
 $('closeSet').onclick=()=>$('mSet').classList.remove('show');
 $('apply').onclick=()=>{$('mSet').classList.remove('show');games=[0,0];newGame()};
 if('serviceWorker' in navigator){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
-load();render();
+load();applyLang();render();
 </script>
 </body>
 </html>
