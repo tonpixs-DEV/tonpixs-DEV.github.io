@@ -21,7 +21,9 @@
   button { width:100%; padding:12px; border:0; border-radius:10px; background:var(--acc); color:#fff; font-size:1rem; font-weight:600; cursor:pointer; }
   button:disabled { opacity:.45; cursor:not-allowed; }
   #file { margin-top:14px; font-size:.9rem; word-break:break-all; color:var(--mute); }
-  .yt { margin-top:18px; display:flex; flex-direction:column; gap:8px; }
+  .yt-wrap { margin-top:18px; color:var(--mute); font-size:.85rem; }
+  .yt-wrap summary { cursor:pointer; padding:6px 0; }
+  .yt { margin-top:8px; display:flex; flex-direction:column; gap:8px; }
   .yt input { background:var(--card); color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:10px; font-size:.95rem; width:100%; }
   .yt small { color:var(--mute); font-size:.78rem; line-height:1.4; }
   .yt code { background:var(--card); padding:1px 5px; border-radius:4px; }
@@ -47,6 +49,8 @@
   <input id="picker" type="file" accept="video/*,audio/*" hidden>
   <div id="file"></div>
 
+  <details class="yt-wrap">
+    <summary>ขั้นสูง: แปลงลิงก์ YouTube (ต้องรันโปรแกรมช่วยบนเครื่องตัวเอง)</summary>
   <div class="yt">
     <label>หรือวางลิงก์ YouTube
       <input id="yturl" type="url" placeholder="https://www.youtube.com/watch?v=...">
@@ -54,6 +58,7 @@
     <button id="ytgo" class="alt">แปลงลิงก์ YouTube</button>
     <small>ต้องเปิดโปรแกรมช่วยบนเครื่องคุณก่อน: <code>python youtube_to_mp3.py --serve</code> (ใช้กับวิดีโอที่คุณมีสิทธิ์ใช้งานเท่านั้น)</small>
   </div>
+  </details>
 
   <div class="row">
     <label>คุณภาพ (bitrate)
