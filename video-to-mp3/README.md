@@ -27,3 +27,6 @@ python youtube_to_mp3.py --serve
 ```
 python youtube_to_mp3.py "https://www.youtube.com/watch?v=XXXX" -o D:\mp3 -b 192
 ```
+
+## ให้ลูกค้าวางลิงก์ YouTube บนหน้าเว็บโดยไม่ต้องติดตั้ง
+ต้อง deploy API ของตัวเองก่อน ดูขั้นตอนใน [`api/README.md`](api/README.md) แล้วใส่ URL ใน `config.js`

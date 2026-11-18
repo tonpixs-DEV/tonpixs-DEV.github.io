@@ -86,6 +86,7 @@
   <footer>เหมาะกับคลิปสั้นถึงปานกลาง (ราว 1 ชั่วโมงหรือสั้นกว่า) เพราะต้องถอดเสียงทั้งไฟล์ในหน่วยความจำของเบราว์เซอร์ ไฟล์ยาวมากอาจไม่ผ่านบนมือถือ</footer>
 </main>
 
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lamejs@1.2.1/lame.min.js"></script>
 <script>
 (function () {
@@ -184,7 +185,12 @@
   function refreshGo() { go.disabled = !(current || YT_RE.test($("yturl").value.trim())); }
   go.addEventListener("click", function () { if (current) convert(); else convertYoutube(); });
 
-  var ytgo = $("ytgo"), yturl = $("yturl"), HELPER = "http://127.0.0.1:8787";
+  var ytgo = $("ytgo"), yturl = $("yturl"), REMOTE = (window.MP3_API || "").replace(/\/+$/, ""), HELPER = REMOTE || "http://127.0.0.1:8787";
+  if (REMOTE) {
+    var wrap = document.querySelector(".yt-wrap"); wrap.open = true;
+    wrap.querySelector("summary").textContent = "แปลงลิงก์ YouTube";
+    document.querySelector(".yt small").textContent = "ใช้กับวิดีโอที่คุณมีสิทธิ์ใช้งานเท่านั้น (รับคลิปไม่เกิน 15 นาที)";
+  }
   async function convertYoutube() {
     var url = yturl.value.trim();
     if (!/^https?:\/\/(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//i.test(url)) {
@@ -193,9 +199,9 @@
     ytgo.disabled = true; go.disabled = true; result.style.display = "none";
     bar.style.display = "none";
     try {
-      setStatus("กำลังเชื่อมต่อโปรแกรมช่วยบนเครื่องคุณ…");
+      setStatus(REMOTE ? "กำลังเชื่อมต่อเซิร์ฟเวอร์…" : "กำลังเชื่อมต่อโปรแกรมช่วยบนเครื่องคุณ…");
       try { await fetch(HELPER + "/ping"); }
-      catch (e) { throw new Error("เชื่อมต่อโปรแกรมช่วยไม่ได้ เปิดด้วยคำสั่ง python youtube_to_mp3.py --serve ก่อน แล้วลองใหม่ (ถ้าเบราว์เซอร์ถามสิทธิ์เข้าถึงเครือข่ายในเครื่อง ให้กดอนุญาต)"); }
+      catch (e) { throw new Error(REMOTE ? "เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้งในภายหลัง" : "เชื่อมต่อโปรแกรมช่วยไม่ได้ เปิดด้วยคำสั่ง python youtube_to_mp3.py --serve ก่อน แล้วลองใหม่ (ถ้าเบราว์เซอร์ถามสิทธิ์เข้าถึงเครือข่ายในเครื่อง ให้กดอนุญาต)"); }
       setStatus("กำลังดาวน์โหลดและแปลงเป็น MP3… (อาจใช้เวลาสักครู่)");
       var res = await fetch(HELPER + "/convert?url=" + encodeURIComponent(url) + "&bitrate=" + $("bitrate").value);
       if (!res.ok) throw new Error(await res.text());
