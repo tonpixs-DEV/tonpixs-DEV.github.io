@@ -180,7 +180,9 @@
       go.disabled = false;
     }
   }
-  go.addEventListener("click", convert);
+  var YT_RE = /^https?:\/\/(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//i;
+  function refreshGo() { go.disabled = !(current || YT_RE.test($("yturl").value.trim())); }
+  go.addEventListener("click", function () { if (current) convert(); else convertYoutube(); });
 
   var ytgo = $("ytgo"), yturl = $("yturl"), HELPER = "http://127.0.0.1:8787";
   async function convertYoutube() {
@@ -209,10 +211,11 @@
     } catch (e) {
       setStatus(e.message || String(e), "err");
     } finally {
-      ytgo.disabled = false; go.disabled = !current;
+      ytgo.disabled = false; refreshGo();
     }
   }
   ytgo.addEventListener("click", convertYoutube);
+  yturl.addEventListener("input", refreshGo);
 })();
 </script>
 </body>
