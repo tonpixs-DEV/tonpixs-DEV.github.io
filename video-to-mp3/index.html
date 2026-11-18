@@ -21,6 +21,11 @@
   button { width:100%; padding:12px; border:0; border-radius:10px; background:var(--acc); color:#fff; font-size:1rem; font-weight:600; cursor:pointer; }
   button:disabled { opacity:.45; cursor:not-allowed; }
   #file { margin-top:14px; font-size:.9rem; word-break:break-all; color:var(--mute); }
+  .yt { margin-top:18px; display:flex; flex-direction:column; gap:8px; }
+  .yt input { background:var(--card); color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:10px; font-size:.95rem; width:100%; }
+  .yt small { color:var(--mute); font-size:.78rem; line-height:1.4; }
+  .yt code { background:var(--card); padding:1px 5px; border-radius:4px; }
+  button.alt { background:#2b3140; }
   progress { width:100%; height:10px; margin-top:14px; display:none; }
   #status { margin-top:10px; font-size:.9rem; min-height:1.2em; }
   #status.err { color:var(--err); } #status.ok { color:var(--ok); }
@@ -41,6 +46,14 @@
   </div>
   <input id="picker" type="file" accept="video/*,audio/*" hidden>
   <div id="file"></div>
+
+  <div class="yt">
+    <label>หรือวางลิงก์ YouTube
+      <input id="yturl" type="url" placeholder="https://www.youtube.com/watch?v=...">
+    </label>
+    <button id="ytgo" class="alt">แปลงลิงก์ YouTube</button>
+    <small>ต้องเปิดโปรแกรมช่วยบนเครื่องคุณก่อน: <code>python youtube_to_mp3.py --serve</code> (ใช้กับวิดีโอที่คุณมีสิทธิ์ใช้งานเท่านั้น)</small>
+  </div>
 
   <div class="row">
     <label>คุณภาพ (bitrate)
@@ -163,6 +176,38 @@
     }
   }
   go.addEventListener("click", convert);
+
+  var ytgo = $("ytgo"), yturl = $("yturl"), HELPER = "http://127.0.0.1:8787";
+  async function convertYoutube() {
+    var url = yturl.value.trim();
+    if (!/^https?:\/\/(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//i.test(url)) {
+      setStatus("กรุณาวางลิงก์ YouTube ให้ถูกต้อง", "err"); return;
+    }
+    ytgo.disabled = true; go.disabled = true; result.style.display = "none";
+    bar.style.display = "none";
+    try {
+      setStatus("กำลังเชื่อมต่อโปรแกรมช่วยบนเครื่องคุณ…");
+      try { await fetch(HELPER + "/ping"); }
+      catch (e) { throw new Error("เชื่อมต่อโปรแกรมช่วยไม่ได้ เปิดด้วยคำสั่ง python youtube_to_mp3.py --serve ก่อน แล้วลองใหม่ (ถ้าเบราว์เซอร์ถามสิทธิ์เข้าถึงเครือข่ายในเครื่อง ให้กดอนุญาต)"); }
+      setStatus("กำลังดาวน์โหลดและแปลงเป็น MP3… (อาจใช้เวลาสักครู่)");
+      var res = await fetch(HELPER + "/convert?url=" + encodeURIComponent(url) + "&bitrate=" + $("bitrate").value);
+      if (!res.ok) throw new Error(await res.text());
+      var title = "youtube";
+      try { title = decodeURIComponent(res.headers.get("X-Title") || "youtube"); } catch (e) {}
+      var blob = await res.blob();
+      if (lastUrl) URL.revokeObjectURL(lastUrl);
+      lastUrl = URL.createObjectURL(blob);
+      dl.href = lastUrl; dl.download = title + ".mp3";
+      dl.textContent = "ดาวน์โหลด " + title + ".mp3 (" + (blob.size / 1048576).toFixed(1) + " MB)";
+      player.src = lastUrl; result.style.display = "block";
+      setStatus("เสร็จแล้ว", "ok");
+    } catch (e) {
+      setStatus(e.message || String(e), "err");
+    } finally {
+      ytgo.disabled = false; go.disabled = !current;
+    }
+  }
+  ytgo.addEventListener("click", convertYoutube);
 })();
 </script>
 </body>
